@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IRRRL Watch</title>
+  <style>
+    :root {
+      --bg: #0f1110;
+      --panel: #181c18;
+      --panel-2: #111611;
+      --header: #08100B;
+      --text: #f3f7f3;
+      --muted: #a7b0a7;
+      --green: #7CFF8A;
+      --green-soft: rgba(124, 255, 138, 0.18);
+      --green-border: rgba(124, 255, 138, 0.36);
+      --danger: #ff6b6b;
+      --warn: #ffd166;
+      --line: rgba(255, 255, 255, 0.08);
+      --shadow: 0 18px 45px rgba(0,0,0,0.38);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(124,255,138,0.10), transparent 34rem),
+        radial-gradient(circle at bottom right, rgba(124,255,138,0.06), transparent 28rem),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: linear-gradient(180deg, var(--header), rgba(8,16,11,0.92));
+      border-bottom: 1px solid var(--line);
+      padding: 16px 14px 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.35rem;
+      letter-spacing: 0.02em;
+      color: var(--green);
+      text-shadow: 0 0 18px var(--green-soft);
+    }
+
+    .subtitle {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .pill {
+      border: 1px solid var(--green-border);
+      color: var(--green);
+      background: var(--green-soft);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 16px 14px 42px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 14px;
+    }
+
+    .card {
+      grid-column: span 12;
+      background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.012)), var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+
+    @media (min-width: 760px) {
+      .half { grid-column: span 6; }
+      .third { grid-column: span 4; }
+      .two-thirds { grid-column: span 8; }
+    }
+
+    .card-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 0.98rem;
+      color: var(--green);
+      letter-spacing: 0.01em;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.35;
+    }
+
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.78rem;
+      margin-bottom: 6px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      background: #0c100d;
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.11);
+      border-radius: 12px;
+      padding: 11px 10px;
+      outline: none;
+      font-size: 0.96rem;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--green-border);
+      box-shadow: 0 0 0 3px var(--green-soft);
+    }
+
+    textarea { min-height: 76px; resize: vertical; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .form-grid .full { grid-column: 1 / -1; }
+
+    @media (max-width: 520px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .form-grid .full { grid-column: auto; }
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 13px;
+      padding: 11px 13px;
+      font-weight: 750;
+      cursor: pointer;
+      background: var(--green);
+      color: #071008;
+      box-shadow: 0 0 22px var(--green-soft);
+    }
+
+    button.secondary {
+      background: #101610;
+      color: var(--green);
+      border: 1px solid var(--green-border);
+      box-shadow: none;
+    }
+
+    button.danger {
+      background: transparent;
+      color: var(--danger);
+      border: 1px solid rgba(255,107,107,0.42);
+      box-shadow: none;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    @media (min-width: 760px) {
+      .metrics { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    .metric {
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      padding: 12px;
+      min-height: 92px;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 0.74rem;
+      margin-bottom: 7px;
+    }
+
+    .metric-value {
+      font-size: 1.25rem;
+      font-weight: 850;
+      color: var(--text);
+    }
+
+    .metric-value.good { color: var(--green); }
+    .metric-value.warn { color: var(--warn); }
+    .metric-value.bad { color: var(--danger); }
+
+    .target-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .target-row {
+      display: grid;
+      grid-template-columns: 90px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px;
+    }
+
+    .target-rate {
+      color: var(--green);
+      font-weight: 850;
+      font-size: 1rem;
+    }
+
+    .target-copy {
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.25;
+    }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--muted);
+      box-shadow: 0 0 12px rgba(255,255,255,0.12);
+    }
+
+    .status-dot.good { background: var(--green); box-shadow: 0 0 14px var(--green-soft); }
+    .status-dot.warn { background: var(--warn); }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 860px;
+      background: #0c100d;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      font-size: 0.84rem;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--green);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      background: #0a0f0b;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .note {
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.35;
+      margin-top: 10px;
+    }
+
+    .empty {
+      color: var(--muted);
+      text-align: center;
+      padding: 22px 10px;
+      background: #0c100d;
+      border: 1px dashed rgba(255,255,255,0.13);
+      border-radius: 14px;
+    }
+
+    .mini-delete {
+      padding: 7px 9px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      color: var(--danger);
+      background: transparent;
+      border: 1px solid rgba(255,107,107,0.36);
+      box-shadow: none;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%) translateY(18px);
+      background: #101610;
+      color: var(--green);
+      border: 1px solid var(--green-border);
+      border-radius: 999px;
+      padding: 10px 14px;
+      opacity: 0;
+      pointer-events: none;
+      transition: 180ms ease;
+      box-shadow: var(--shadow);
+      z-index: 20;
+      font-size: 0.85rem;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div>
+        <h1>IRRRL Watch</h1>
+        <p class="subtitle">10Y yield • IRRRL quote • spread • payment savings</p>
+      </div>
+      <div class="pill">Manual MVP</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="grid">
+      <div class="card half">
+        <div class="card-title">
+          <h2>Loan Baseline</h2>
+          <span class="hint">Used for payment savings</span>
+        </div>
+        <div class="form-grid">
+          <div>
+            <label for="loanBalance">Current loan balance</label>
+            <input id="loanBalance" type="number" inputmode="decimal" placeholder="597000" />
+          </div>
+          <div>
+            <label for="currentRate">Current rate %</label>
+            <input id="currentRate" type="number" inputmode="decimal" step="0.001" placeholder="6.25" />
+          </div>
+          <div>
+            <label for="remainingYears">Years remaining</label>
+            <input id="remainingYears" type="number" inputmode="decimal" step="0.1" placeholder="29" />
+          </div>
+          <div>
+            <label for="currentPayment">Current P&I payment</label>
+            <input id="currentPayment" type="number" inputmode="decimal" placeholder="auto if blank" />
+          </div>
+          <div>
+            <label for="refiYears">New IRRRL term years</label>
+            <input id="refiYears" type="number" inputmode="decimal" step="0.1" placeholder="30" />
+          </div>
+          <div>
+            <label for="closingCosts">Costs / funding fee / points</label>
+            <input id="closingCosts" type="number" inputmode="decimal" placeholder="6500" />
+          </div>
+          <div class="full">
+            <label for="targetRates">Target quote rates %, comma separated</label>
+            <input id="targetRates" type="text" placeholder="5.50, 5.25, 5.00" />
+          </div>
+        </div>
+        <div class="button-row">
+          <button onclick="saveSettings()">Save Baseline</button>
+          <button class="secondary" onclick="resetSettings()">Reset</button>
+        </div>
+        <p class="note">Payment savings are P&I only. Taxes, insurance, escrow, and actual lender costs should be checked separately.</p>
+      </div>
+
+      <div class="card half">
+        <div class="card-title">
+          <h2>Today’s Quote</h2>
+          <span class="hint">Manual entry for now</span>
+        </div>
+        <div class="form-grid">
+          <div>
+            <label for="quoteDate">Quote date</label>
+            <input id="quoteDate" type="date" />
+          </div>
+          <div>
+            <label for="tenYearYield">10Y Treasury yield %</label>
+            <input id="tenYearYield" type="number" inputmode="decimal" step="0.001" placeholder="4.25" />
+          </div>
+          <div>
+            <label for="irrrlRate">IRRRL quote rate %</label>
+            <input id="irrrlRate" type="number" inputmode="decimal" step="0.001" placeholder="5.75" />
+          </div>
+          <div>
+            <label for="points">Points %</label>
+            <input id="points" type="number" inputmode="decimal" step="0.001" placeholder="0.00" />
+          </div>
+          <div class="full">
+            <label for="quoteNote">Source / lender / note</label>
+            <textarea id="quoteNote" placeholder="Example: Veterans United, no points, rough online quote"></textarea>
+          </div>
+        </div>
+        <div class="button-row">
+          <button onclick="saveQuote()">Save Quote</button>
+          <button class="secondary" onclick="calculateAndRender()">Recalculate</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <h2>Current Watch</h2>
+          <span class="hint">Live from your current manual inputs</span>
+        </div>
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-label">Spread vs 10Y</div>
+            <div class="metric-value" id="spreadMetric">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Estimated new P&I</div>
+            <div class="metric-value" id="newPaymentMetric">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Monthly savings</div>
+            <div class="metric-value" id="savingsMetric">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Break-even</div>
+            <div class="metric-value" id="breakevenMetric">—</div>
+          </div>
+        </div>
+        <div id="targetList" class="target-list"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <h2>Quote History</h2>
+          <span class="hint" id="historyCount">0 saved</span>
+        </div>
+        <div id="historyContainer"></div>
+        <div class="button-row">
+          <button class="secondary" onclick="exportHistory()">Export JSON</button>
+          <button class="secondary" onclick="importHistoryPrompt()">Import JSON</button>
+          <button class="danger" onclick="clearHistory()">Clear History</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const SETTINGS_KEY = "irrrlWatchSettings";
+    const HISTORY_KEY = "irrrlQuoteHistory";
+
+    const defaultSettings = {
+      loanBalance: 597000,
+      currentRate: 6.25,
+      remainingYears: 29,
+      currentPayment: "",
+      refiYears: 30,
+      closingCosts: 6500,
+      targetRates: "5.50, 5.25, 5.00"
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    function todayISO() {
+      const d = new Date();
+      const offset = d.getTimezoneOffset();
+      const local = new Date(d.getTime() - offset * 60000);
+      return local.toISOString().slice(0, 10);
+    }
+
+    function num(id) {
+      const value = parseFloat($(id).value);
+      return Number.isFinite(value) ? value : 0;
+    }
+
+    function money(value) {
+      if (!Number.isFinite(value)) return "—";
+      return value.toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+    }
+
+    function pct(value) {
+      if (!Number.isFinite(value)) return "—";
+      return `${value.toFixed(3)}%`;
+    }
+
+    function monthsLabel(months) {
+      if (!Number.isFinite(months) || months <= 0) return "—";
+      if (months < 12) return `${months.toFixed(1)} mo`;
+      return `${(months / 12).toFixed(1)} yrs`;
+    }
+
+    function mortgagePayment(principal, annualRate, years) {
+      if (principal <= 0 || years <= 0) return NaN;
+      const months = years * 12;
+      const monthlyRate = annualRate / 100 / 12;
+      if (monthlyRate === 0) return principal / months;
+      return principal * monthlyRate * Math.pow(1 + monthlyRate, months) / (Math.pow(1 + monthlyRate, months) - 1);
+    }
+
+    function getSettingsFromForm() {
+      return {
+        loanBalance: num("loanBalance"),
+        currentRate: num("currentRate"),
+        remainingYears: num("remainingYears"),
+        currentPayment: $("currentPayment").value.trim(),
+        refiYears: num("refiYears"),
+        closingCosts: num("closingCosts"),
+        targetRates: $("targetRates").value.trim()
+      };
+    }
+
+    function loadSettings() {
+      const saved = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "null");
+      const settings = { ...defaultSettings, ...(saved || {}) };
+      $("loanBalance").value = settings.loanBalance ?? "";
+      $("currentRate").value = settings.currentRate ?? "";
+      $("remainingYears").value = settings.remainingYears ?? "";
+      $("currentPayment").value = settings.currentPayment ?? "";
+      $("refiYears").value = settings.refiYears ?? "";
+      $("closingCosts").value = settings.closingCosts ?? "";
+      $("targetRates").value = settings.targetRates ?? "";
+    }
+
+    function saveSettings(show = true) {
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(getSettingsFromForm()));
+      calculateAndRender();
+      if (show) toast("Baseline saved");
+    }
+
+    function resetSettings() {
+      if (!confirm("Reset baseline to starter values?")) return;
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(defaultSettings));
+      loadSettings();
+      calculateAndRender();
+      toast("Baseline reset");
+    }
+
+    function getHistory() {
+      return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]");
+    }
+
+    function setHistory(history) {
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+      renderHistory();
+    }
+
+    function getCurrentSnapshot() {
+      const settings = getSettingsFromForm();
+      const tenY = num("tenYearYield");
+      const quoteRate = num("irrrlRate");
+      const spread = quoteRate - tenY;
+      const financedPrincipal = settings.loanBalance + settings.closingCosts;
+      const newPayment = mortgagePayment(financedPrincipal, quoteRate, settings.refiYears);
+      const calculatedCurrentPayment = mortgagePayment(settings.loanBalance, settings.currentRate, settings.remainingYears);
+      const currentPayment = parseFloat(settings.currentPayment) || calculatedCurrentPayment;
+      const savings = currentPayment - newPayment;
+      const breakevenMonths = savings > 0 ? settings.closingCosts / savings : NaN;
+
+      return {
+        settings,
+        date: $("quoteDate").value || todayISO(),
+        tenY,
+        quoteRate,
+        points: num("points"),
+        note: $("quoteNote").value.trim(),
+        spread,
+        financedPrincipal,
+        newPayment,
+        currentPayment,
+        savings,
+        breakevenMonths
+      };
+    }
+
+    function calculateAndRender() {
+      const snap = getCurrentSnapshot();
+
+      $("spreadMetric").textContent = Number.isFinite(snap.spread) ? pct(snap.spread) : "—";
+      $("newPaymentMetric").textContent = money(snap.newPayment);
+      $("savingsMetric").textContent = money(snap.savings);
+      $("breakevenMetric").textContent = monthsLabel(snap.breakevenMonths);
+
+      $("savingsMetric").className = `metric-value ${snap.savings > 0 ? "good" : snap.savings < 0 ? "bad" : ""}`;
+      $("breakevenMetric").className = `metric-value ${snap.breakevenMonths > 0 && snap.breakevenMonths <= 24 ? "good" : snap.breakevenMonths > 24 ? "warn" : ""}`;
+
+      renderTargets(snap);
+      saveSettings(false);
+    }
+
+    function renderTargets(snap) {
+      const rawTargets = (snap.settings.targetRates || "")
+        .split(",")
+        .map(x => parseFloat(x.trim()))
+        .filter(Number.isFinite)
+        .sort((a, b) => b - a);
+
+      if (!rawTargets.length) {
+        $("targetList").innerHTML = `<div class="empty">Add target quote rates above, like 5.50, 5.25, 5.00.</div>`;
+        return;
+      }
+
+      const html = rawTargets.map(targetRate => {
+        const impliedTenY = Number.isFinite(snap.spread) ? targetRate - snap.spread : NaN;
+        const targetPayment = mortgagePayment(snap.settings.loanBalance + snap.settings.closingCosts, targetRate, snap.settings.refiYears);
+        const targetSavings = snap.currentPayment - targetPayment;
+        const targetBreakeven = targetSavings > 0 ? snap.settings.closingCosts / targetSavings : NaN;
+        const hit = snap.quoteRate > 0 && snap.quoteRate <= targetRate;
+        const close = snap.quoteRate > 0 && snap.quoteRate <= targetRate + 0.25;
+        const dotClass = hit ? "good" : close ? "warn" : "";
+
+        return `
+          <div class="target-row">
+            <div class="target-rate">${targetRate.toFixed(2)}%</div>
+            <div class="target-copy">
+              If spread holds, watch for 10Y around <strong>${pct(impliedTenY)}</strong>.<br>
+              Est. P&I ${money(targetPayment)} • Savings ${money(targetSavings)} • BE ${monthsLabel(targetBreakeven)}
+            </div>
+            <div class="status-dot ${dotClass}" title="${hit ? "Target hit" : close ? "Close" : "Waiting"}"></div>
+          </div>
+        `;
+      }).join("");
+
+      $("targetList").innerHTML = html;
+    }
+
+    function saveQuote() {
+      const snap = getCurrentSnapshot();
+      if (!snap.tenY || !snap.quoteRate) {
+        toast("Enter 10Y and IRRRL quote first");
+        return;
+      }
+
+      const history = getHistory();
+      history.unshift({
+        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+        savedAt: new Date().toISOString(),
+        date: snap.date,
+        tenY: snap.tenY,
+        quoteRate: snap.quoteRate,
+        points: snap.points,
+        spread: snap.spread,
+        newPayment: snap.newPayment,
+        currentPayment: snap.currentPayment,
+        savings: snap.savings,
+        breakevenMonths: snap.breakevenMonths,
+        closingCosts: snap.settings.closingCosts,
+        refiYears: snap.settings.refiYears,
+        note: snap.note
+      });
+      setHistory(history);
+      toast("Quote saved");
+    }
+
+    function renderHistory() {
+      const history = getHistory();
+      $("historyCount").textContent = `${history.length} saved`;
+
+      if (!history.length) {
+        $("historyContainer").innerHTML = `<div class="empty">No quotes saved yet. Add a 10Y yield and IRRRL quote, then tap Save Quote.</div>`;
+        return;
+      }
+
+      const rows = history.map(item => `
+        <tr>
+          <td>${item.date || "—"}</td>
+          <td>${pct(item.tenY)}</td>
+          <td>${pct(item.quoteRate)}</td>
+          <td>${pct(item.spread)}</td>
+          <td>${money(item.newPayment)}</td>
+          <td>${money(item.savings)}</td>
+          <td>${monthsLabel(item.breakevenMonths)}</td>
+          <td>${item.points ? item.points.toFixed(3) + "%" : "—"}</td>
+          <td>${escapeHtml(item.note || "")}</td>
+          <td><button class="mini-delete" onclick="deleteQuote('${item.id}')">Delete</button></td>
+        </tr>
+      `).join("");
+
+      $("historyContainer").innerHTML = `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>10Y</th>
+                <th>Quote</th>
+                <th>Spread</th>
+                <th>New P&I</th>
+                <th>Savings</th>
+                <th>BE</th>
+                <th>Points</th>
+                <th>Note</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function deleteQuote(id) {
+      setHistory(getHistory().filter(item => item.id !== id));
+      toast("Quote deleted");
+    }
+
+    function clearHistory() {
+      if (!confirm("Clear all saved IRRRL quotes?")) return;
+      setHistory([]);
+      toast("History cleared");
+    }
+
+    function exportHistory() {
+      const payload = {
+        app: "IRRRL Watch",
+        exportedAt: new Date().toISOString(),
+        settings: getSettingsFromForm(),
+        history: getHistory()
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `irrrl-watch-export-${todayISO()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast("Export downloaded");
+    }
+
+    function importHistoryPrompt() {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "application/json";
+      input.onchange = async () => {
+        const file = input.files?.[0];
+        if (!file) return;
+        try {
+          const text = await file.text();
+          const payload = JSON.parse(text);
+          if (payload.settings) {
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify(payload.settings));
+            loadSettings();
+          }
+          if (Array.isArray(payload.history)) {
+            setHistory(payload.history);
+          }
+          calculateAndRender();
+          toast("Import complete");
+        } catch (err) {
+          toast("Import failed");
+        }
+      };
+      input.click();
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function toast(message) {
+      const el = $("toast");
+      el.textContent = message;
+      el.classList.add("show");
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => el.classList.remove("show"), 1500);
+    }
+
+    function attachAutoCalc() {
+      [
+        "loanBalance", "currentRate", "remainingYears", "currentPayment", "refiYears",
+        "closingCosts", "targetRates", "tenYearYield", "irrrlRate", "points", "quoteNote", "quoteDate"
+      ].forEach(id => {
+        $(id).addEventListener("input", calculateAndRender);
+        $(id).addEventListener("change", calculateAndRender);
+      });
+    }
+
+    function init() {
+      $("quoteDate").value = todayISO();
+      loadSettings();
+      attachAutoCalc();
+      renderHistory();
+      calculateAndRender();
+    }
+
+    init();
+  </script>
+</body>
+</html>
+
+<small> Built By G-Well </small>
+//<!-- Test -->//
